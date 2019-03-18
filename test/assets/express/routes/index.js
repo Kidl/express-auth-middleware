@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-const checkAccess = require('../../../middleware/checkAccess')();
-const checkAccessWithVerify = require('../../../middleware/checkAccess')(getUserAsync);
+const checkAccess = require('../../../../middleware/checkAccess')();
+const checkAccessWithVerify = require('../../../../middleware/checkAccess')(getUserAsync);
 
 router.get('/users', checkAccess, function(req, res, next) {
   res.json(req.user);

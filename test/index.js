@@ -6,11 +6,11 @@ process.env.NODE_ENV = 'test';
 const jwt = require('jsonwebtoken');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const app = require('./assets/app');
+const app = require('./assets/express/app');
+const appKoa = require('./assets/koa/app').callback();
 
 const parseScope = require('../lib/parseScope');
 const checkAccess = require('../lib/checkAccess');
-const checkAccessMiddleware = require('../middleware/checkAccess');
 
 chai.use(chaiHttp);
 const should = chai.should();
@@ -571,7 +571,55 @@ describe('lib', () => {
 
 describe('middleware', () => {
   describe('checkAccess', () => {
-    it('should return user', async () => {
+    it('should return user', (done) => {
+      chai.request(app)
+        .get('/users/testuser')
+        .set('x-access-token', testUserToken)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('string');
+          res.body.should.be.eq('testuser');
+
+          done();
+        });
+    });
+
+    it('should return error 401 Unauthorized (no token)', (done) => {
+      chai.request(app)
+        .get('/users')
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.be.a('object');
+
+          done();
+        });
+    });
+
+    it('should return error 403 Forbidden (low scope)', (done) => {
+      chai.request(app)
+        .get('/users')
+        .set('x-access-token', testUser2Token)
+        .end((err, res) => {
+          res.should.have.status(403);
+          res.body.should.be.a('object');
+
+          done();
+        });
+    });
+
+    it('should return error 403 Forbidden (invalid token)', (done) => {
+      chai.request(app)
+        .get('/users')
+        .set('x-access-token', 123)
+        .end((err, res) => {
+          res.should.have.status(403);
+          res.body.should.be.a('object');
+
+          done();
+        });
+    });
+
+    it('should return user', (done) => {
       chai.request(app)
         .get('/users')
         .set('x-access-token', testUserToken)
@@ -579,41 +627,73 @@ describe('middleware', () => {
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.username.should.be.eq('testuser');
+
+          done();
         });
     });
   });
 
-  describe('checkAccess', () => {
-    it('should return error 401 Unauthorized (no token)', async () => {
-      chai.request(app)
+
+  describe('checkAccess (koa)', () => {
+    it('should return user', (done) => {
+      chai.request(appKoa)
+        .get('/users/testuser2')
+        .set('x-access-token', testUserToken)
+        .end((err, res) => {
+          res.should.have.status(200);
+
+          res.text.should.be.a('string');
+          res.text.should.be.eq('testuser');
+
+          done();
+        });
+    });
+
+    it('should return error 401 Unauthorized (no token)', (done) => {
+      chai.request(appKoa)
         .get('/users')
         .end((err, res) => {
           res.should.have.status(401);
           res.body.should.be.a('object');
+
+          done();
         });
     });
-  });
 
-  describe('checkAccess', () => {
-    it('should return error 403 Forbidden (low scope)', async () => {
-      chai.request(app)
+    it('should return error 403 Forbidden (low scope)', (done) => {
+      chai.request(appKoa)
         .get('/users')
         .set('x-access-token', testUser2Token)
         .end((err, res) => {
           res.should.have.status(403);
           res.body.should.be.a('object');
+
+          done();
         });
     });
-  });
 
-  describe('checkAccess', () => {
-    it('should return error 403 Forbidden (invalid token)', async () => {
-      chai.request(app)
+    it('should return error 403 Forbidden (invalid token)', (done) => {
+      chai.request(appKoa)
         .get('/users')
         .set('x-access-token', 123)
         .end((err, res) => {
           res.should.have.status(403);
           res.body.should.be.a('object');
+
+          done();
+        });
+    });
+
+    it('should return user', (done) => {
+      chai.request(appKoa)
+        .get('/users')
+        .set('x-access-token', testUserToken)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.username.should.be.eq('testuser');
+
+          done();
         });
     });
   });

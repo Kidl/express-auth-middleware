@@ -1,6 +1,6 @@
 {
   "name": "@kidl.no/express-auth-middleware",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "middleware/checkAccess.js",
   "files": [
@@ -19,6 +19,8 @@
     "chai": "^4.2.0",
     "chai-http": "^4.2.1",
     "express": "^4.16.4",
+    "koa": "^2.7.0",
+    "koa-router": "^7.4.0",
     "mocha": "^6.0.2"
   }
 }

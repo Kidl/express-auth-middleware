@@ -3,9 +3,32 @@ const checkAccess = require('../lib/checkAccess');
 module.exports = function(verify) {
   return async function(req, res, next) {
     try {
-      const method = Object.keys(req.route.methods)[0];
-      const params = req.params;
-      const route = req.route.path.replace(/\//g, '').split(':')[0];
+      let method, params, route;
+
+      if (arguments.length === 2) {
+        // koa
+
+        const context = req;
+
+        req = req.req;
+
+        next = function(err) {
+          if (err) {
+            throw err;
+          } else {
+            res();
+          }
+        };
+
+        method = req.method.toLowerCase();
+        params = context.params;
+      } else {
+        // express
+
+        method = Object.keys(req.route.methods)[0];
+        params = req.params;
+        route = req.route.path.replace(/\//g, '').split(':')[0];
+      }
 
       let token = req.headers['x-access-token'];
 
