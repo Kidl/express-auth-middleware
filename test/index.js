@@ -60,7 +60,7 @@ const testUser6Token = jwt.sign(testUser6, process.env.JWT_SECRET);
 
 describe('lib', () => {
   describe('parseScope', () => {
-    it('__all', (done) => {
+    it('__all', () => {
       const scope = parseScope('__all');
 
       scope.should.be.a('object');
@@ -74,11 +74,9 @@ describe('lib', () => {
       scope.method.should.be.eq('');
       scope.route.should.be.eq('all');
       should.not.exist(scope.paramname);
-
-      done();
     });
 
-    it('_get_auth', (done) => {
+    it('_get_auth', () => {
       const scope = parseScope('_get_auth');
 
       scope.should.be.a('object');
@@ -92,11 +90,9 @@ describe('lib', () => {
       scope.method.should.be.eq('get');
       scope.route.should.be.eq('auth');
       should.not.exist(scope.paramname);
-
-      done();
     });
 
-    it('_get_', (done) => {
+    it('_get_', () => {
       const scope = parseScope('_get_');
 
       scope.should.be.a('object');
@@ -110,11 +106,9 @@ describe('lib', () => {
       scope.method.should.be.eq('get');
       scope.route.should.be.eq('');
       should.not.exist(scope.paramname);
-
-      done();
     });
 
-    it('auth_get_', (done) => {
+    it('auth_get_', () => {
       const scope = parseScope('auth_get_');
 
       scope.should.be.a('object');
@@ -128,11 +122,9 @@ describe('lib', () => {
       scope.method.should.be.eq('get');
       scope.route.should.be.eq('');
       should.not.exist(scope.paramname);
-
-      done();
     });
 
-    it('auth_post_users', (done) => {
+    it('auth_post_users', () => {
       const scope = parseScope('auth_post_users');
 
       scope.should.be.a('object');
@@ -146,11 +138,9 @@ describe('lib', () => {
       scope.method.should.be.eq('post');
       scope.route.should.be.eq('users');
       should.not.exist(scope.paramname);
-
-      done();
     });
 
-    it('auth_put_users:username', (done) => {
+    it('auth_put_users:username', () => {
       const scope = parseScope('auth_put_users:username');
 
       scope.should.be.a('object');
@@ -164,14 +154,12 @@ describe('lib', () => {
       scope.method.should.be.eq('put');
       scope.route.should.be.eq('users');
       scope.paramname.should.be.eq('username');
-
-      done();
     });
   });
 
 
   describe('checkAccess', () => {
-    it('should return user object (testUser:__all, auth get /users/testuser)', (done) => {
+    it('should return user object (testUser:__all, auth get /users/testuser)', async () => {
       const options = {};
 
       options.token = testUserToken;
@@ -183,16 +171,14 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
       user.scope.should.be.eq('__all');
-
-      done();
     });
 
-    it('should return user object (testUser:__all, auth post /users/testuser)', (done) => {
+    it('should return user object (testUser:__all, auth post /users/testuser)', async () => {
       const options = {};
 
       options.token = testUserToken;
@@ -204,16 +190,14 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
       user.scope.should.be.eq('__all');
-
-      done();
     });
 
-    it('should return user object (testUser:__all, auth put /users/testuser)', (done) => {
+    it('should return user object (testUser:__all, auth put /users/testuser)', async () => {
       const options = {};
 
       options.token = testUserToken;
@@ -225,16 +209,14 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
       user.scope.should.be.eq('__all');
-
-      done();
     });
 
-    it('should return user object (testUser:__all, auth delete /users/testuser)', (done) => {
+    it('should return user object (testUser:__all, auth delete /users/testuser)', async () => {
       const options = {};
 
       options.token = testUserToken;
@@ -246,16 +228,14 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
       user.scope.should.be.eq('__all');
-
-      done();
     });
 
-    it('should return user object (testUser:__all, cards delete /users/testuser)', (done) => {
+    it('should return user object (testUser:__all, cards delete /users/testuser)', async () => {
       const options = {};
 
       options.token = testUserToken;
@@ -267,16 +247,14 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
       user.scope.should.be.eq('__all');
-
-      done();
     });
 
-    it('should return user object (testUser:__all, cards post /cards)', (done) => {
+    it('should return user object (testUser:__all, cards post /cards)', async () => {
       const options = {};
 
       options.token = testUserToken;
@@ -287,16 +265,14 @@ describe('lib', () => {
       options.method = 'post';
       options.route = 'cards';
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
       user.scope.should.be.eq('__all');
-
-      done();
     });
 
-    it('should return user object (testUser:__all, cards get /cards/123)', (done) => {
+    it('should return user object (testUser:__all, cards get /cards/123)', async () => {
       const options = {};
 
       options.token = testUserToken;
@@ -308,16 +284,14 @@ describe('lib', () => {
       options.route = 'cards';
       options.params = { cards: '123' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
       user.scope.should.be.eq('__all');
-
-      done();
     });
 
-    it('should return user object (testUser2:_get_auth, auth get /auth/testuser2)', (done) => {
+    it('should return user object (testUser2:_get_auth, auth get /auth/testuser2)', async () => {
       const options = {};
 
       options.token = testUser2Token;
@@ -329,16 +303,14 @@ describe('lib', () => {
       options.route = 'auth';
       options.params = { username: 'testuser2' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(2);
       user.username.should.be.eq('testuser2');
       user.scope.should.be.eq('_get_auth');
-
-      done();
     });
 
-    it('should return user object (testUser2:_get_auth, cards get /auth/testuser2)', (done) => {
+    it('should return user object (testUser2:_get_auth, cards get /auth/testuser2)', async () => {
       const options = {};
 
       options.token = testUser2Token;
@@ -350,16 +322,14 @@ describe('lib', () => {
       options.route = 'auth';
       options.params = { username: 'testuser2' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(2);
       user.username.should.be.eq('testuser2');
       user.scope.should.be.eq('_get_auth');
-
-      done();
     });
 
-    it('should return user object (testUser2:_get_auth, cards get /auth)', (done) => {
+    it('should return user object (testUser2:_get_auth, cards get /auth)', async () => {
       const options = {};
 
       options.token = testUser2Token;
@@ -370,16 +340,14 @@ describe('lib', () => {
       options.method = 'get';
       options.route = 'auth';
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(2);
       user.username.should.be.eq('testuser2');
       user.scope.should.be.eq('_get_auth');
-
-      done();
     });
 
-    it('should return user object (testUser3:_get_all, auth get /users/testuser3)', (done) => {
+    it('should return user object (testUser3:_get_all, auth get /users/testuser3)', async () => {
       const options = {};
 
       options.token = testUser3Token;
@@ -391,16 +359,14 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser3' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(3);
       user.username.should.be.eq('testuser3');
       user.scope.should.be.eq('_get_all');
-
-      done();
     });
 
-    it('should return user object (testUser3:_get_all, auth get /users/testuser6)', (done) => {
+    it('should return user object (testUser3:_get_all, auth get /users/testuser6)', async () => {
       const options = {};
 
       options.token = testUser3Token;
@@ -412,16 +378,14 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser6' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(3);
       user.username.should.be.eq('testuser3');
       user.scope.should.be.eq('_get_all');
-
-      done();
     });
 
-    it('should return user object (testUser3:_get_all, auth get /lalala/123/testuser6)', (done) => {
+    it('should return user object (testUser3:_get_all, auth get /lalala/123/testuser6)', async () => {
       const options = {};
 
       options.token = testUser3Token;
@@ -433,16 +397,14 @@ describe('lib', () => {
       options.route = 'lalala123';
       options.params = { username: 'testuser6' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(3);
       user.username.should.be.eq('testuser3');
       user.scope.should.be.eq('_get_all');
-
-      done();
     });
 
-    it('should return user object (testUser3:_get_all, cards get /lalala/1234/testuser65)', (done) => {
+    it('should return user object (testUser3:_get_all, cards get /lalala/1234/testuser65)', async () => {
       const options = {};
 
       options.token = testUser3Token;
@@ -454,16 +416,14 @@ describe('lib', () => {
       options.route = 'lalala1234';
       options.params = { username: 'testuser65' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(3);
       user.username.should.be.eq('testuser3');
       user.scope.should.be.eq('_get_all');
-
-      done();
     });
 
-    it('should return user object (testUser4:auth_get_users, auth get /users/testuser4)', (done) => {
+    it('should return user object (testUser4:auth_get_users, auth get /users/testuser4)', async () => {
       const options = {};
 
       options.token = testUser4Token;
@@ -475,16 +435,14 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser4' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(4);
       user.username.should.be.eq('testuser4');
       user.scope.should.be.eq('auth_get_users');
-
-      done();
     });
 
-    it('should return user object (testUser5:auth_post_users, auth post /users/testuser5)', (done) => {
+    it('should return user object (testUser5:auth_post_users, auth post /users/testuser5)', async () => {
       const options = {};
 
       options.token = testUser5Token;
@@ -496,16 +454,14 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser5' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(5);
       user.username.should.be.eq('testuser5');
       user.scope.should.be.eq('auth_post_users');
-
-      done();
     });
 
-    it('should return user object (testUser6:auth_put_users:username, auth put /users/testuser6)', (done) => {
+    it('should return user object (testUser6:auth_put_users:username, auth put /users/testuser6)', async () => {
       const options = {};
 
       options.token = testUser6Token;
@@ -517,16 +473,14 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser6' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(6);
       user.username.should.be.eq('testuser6');
       user.scope.should.be.eq('auth_put_users:username');
-
-      done();
     });
 
-    it('should return user object (testUser6:auth_put_users:username, auth put /users)', (done) => {
+    it('should return user object (testUser6:auth_put_users:username, auth put /users)', async () => {
       const options = {};
 
       options.token = testUser6Token;
@@ -538,16 +492,14 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser6' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user._id.should.be.eq(6);
       user.username.should.be.eq('testuser6');
       user.scope.should.be.eq('auth_put_users:username');
-
-      done();
     });
 
-    it('should return false (testUser6:auth_put_users:username, auth post /users/testuser6)', (done) => {
+    it('should return false (testUser6:auth_put_users:username, auth post /users/testuser6)', async () => {
       const options = {};
 
       options.token = testUser6Token;
@@ -559,14 +511,12 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser6' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user.should.be.eq(false);
-
-      done();
     });
 
-    it('should return false (testUser6:auth_put_users:username, auth get /users/testuser6)', (done) => {
+    it('should return false (testUser6:auth_put_users:username, auth get /users/testuser6)', async () => {
       const options = {};
 
       options.token = testUser6Token;
@@ -578,14 +528,12 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser6' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user.should.be.eq(false);
-
-      done();
     });
 
-    it('should return false (testUser6:auth_put_users:username, auth put /cards/123)', (done) => {
+    it('should return false (testUser6:auth_put_users:username, auth put /cards/123)', async () => {
       const options = {};
 
       options.token = testUser6Token;
@@ -597,14 +545,12 @@ describe('lib', () => {
       options.route = 'cards';
       options.params = { card: '123' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user.should.be.eq(false);
-
-      done();
     });
 
-    it('should return false (testUser6:auth_put_users:username, cards put /users/testuser6)', (done) => {
+    it('should return false (testUser6:auth_put_users:username, cards put /users/testuser6)', async () => {
       const options = {};
 
       options.token = testUser6Token;
@@ -616,18 +562,16 @@ describe('lib', () => {
       options.route = 'users';
       options.params = { username: 'testuser6' };
 
-      const user = checkAccess(options);
+      const user = await checkAccess(options);
 
       user.should.be.eq(false);
-
-      done();
     });
   })
 });
 
 describe('middleware', () => {
   describe('checkAccess', () => {
-    it('should return user', (done) => {
+    it('should return user', async () => {
       chai.request(app)
         .get('/users')
         .set('x-access-token', testUserToken)
@@ -635,49 +579,41 @@ describe('middleware', () => {
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.username.should.be.eq('testuser');
-
-          done();
         });
     });
   });
 
   describe('checkAccess', () => {
-    it('should return error 401 Unauthorized (no token)', (done) => {
+    it('should return error 401 Unauthorized (no token)', async () => {
       chai.request(app)
         .get('/users')
         .end((err, res) => {
           res.should.have.status(401);
           res.body.should.be.a('object');
-
-          done();
         });
     });
   });
 
   describe('checkAccess', () => {
-    it('should return error 403 Forbidden (low scope)', (done) => {
+    it('should return error 403 Forbidden (low scope)', async () => {
       chai.request(app)
         .get('/users')
         .set('x-access-token', testUser2Token)
         .end((err, res) => {
           res.should.have.status(403);
           res.body.should.be.a('object');
-
-          done();
         });
     });
   });
 
   describe('checkAccess', () => {
-    it('should return error 403 Forbidden (invalid token)', (done) => {
+    it('should return error 403 Forbidden (invalid token)', async () => {
       chai.request(app)
         .get('/users')
         .set('x-access-token', 123)
         .end((err, res) => {
           res.should.have.status(403);
           res.body.should.be.a('object');
-
-          done();
         });
     });
   });
