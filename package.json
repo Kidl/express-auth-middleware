@@ -1,0 +1,24 @@
+{
+  "name": "@kidl.no/express-auth-middleware",
+  "version": "0.0.1",
+  "description": "",
+  "main": "middleware/checkAccess.js",
+  "files": [
+    "lib",
+    "middleware"
+  ],
+  "scripts": {
+    "test": "mocha --timeout 10000 --exit"
+  },
+  "author": "Vladislav Sevostyanov <vs@kidl.no>",
+  "dependencies": {
+    "dotenv": "^7.0.0",
+    "jsonwebtoken": "^8.5.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.1",
+    "express": "^4.16.4",
+    "mocha": "^6.0.2"
+  }
+}
