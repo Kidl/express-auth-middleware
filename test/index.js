@@ -1,4 +1,5 @@
 const env = require('dotenv');
+
 env.config();
 
 process.env.NODE_ENV = 'test';
@@ -18,37 +19,37 @@ const should = chai.should();
 const testUser = {
   _id: 1,
   username: 'testuser',
-  scope: '__all'
+  scope: '__all',
 };
 
 const testUser2 = {
   _id: 2,
   username: 'testuser2',
-  scope: '_get_auth'
+  scope: '_get_auth',
 };
 
 const testUser3 = {
   _id: 3,
   username: 'testuser3',
-  scope: '_get_all'
+  scope: '_get_all',
 };
 
 const testUser4 = {
   _id: 4,
   username: 'testuser4',
-  scope: 'auth_get_users'
+  scope: 'auth_get_users',
 };
 
 const testUser5 = {
   _id: 5,
   username: 'testuser5',
-  scope: 'auth_post_users'
+  scope: 'auth_post_users',
 };
 
 const testUser6 = {
   _id: 6,
   username: 'testuser6',
-  scope: 'auth_put_users:username'
+  scope: 'auth_put_users:username',
 };
 
 const testUserToken = jwt.sign(testUser, process.env.JWT_SECRET);
@@ -566,7 +567,7 @@ describe('lib', () => {
 
       user.should.be.eq(false);
     });
-  })
+  });
 });
 
 describe('middleware', () => {

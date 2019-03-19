@@ -8,7 +8,8 @@
     "middleware"
   ],
   "scripts": {
-    "test": "mocha --timeout 10000 --exit"
+    "test": "mocha --timeout 10000 --exit",
+    "lint": "eslint --ignore-path .gitignore ."
   },
   "author": "Vladislav Sevostyanov <vs@kidl.no>",
   "dependencies": {
@@ -18,9 +19,16 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.2.1",
+    "eslint": "^5.15.3",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^8.0.1",
     "express": "^4.16.4",
     "koa": "^2.7.0",
     "koa-router": "^7.4.0",
     "mocha": "^6.0.2"
+  },
+  "engines": {
+    "node": ">=v10.15.2"
   }
 }

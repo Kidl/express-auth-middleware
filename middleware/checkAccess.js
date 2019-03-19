@@ -1,7 +1,7 @@
 const checkAccess = require('../lib/checkAccess');
 
-module.exports = function(verify) {
-  return async function(req, res, next) {
+module.exports = function (verify) {
+  return async function (req, res, next) {
     try {
       let method, params, route;
 
@@ -12,7 +12,7 @@ module.exports = function(verify) {
 
         req = req.req;
 
-        next = function(err) {
+        next = (err) => {
           if (err) {
             throw err;
           } else {
@@ -30,7 +30,7 @@ module.exports = function(verify) {
         route = req.route.path.replace(/\//g, '').split(':')[0];
       }
 
-      let token = req.headers['x-access-token'];
+      const token = req.headers['x-access-token'];
 
       let user;
 
@@ -71,13 +71,13 @@ module.exports = function(verify) {
           return next(err);
         }
       } catch (err) {
-        err = new Error('Forbidden');
-        err.status = 403;
+        const error = new Error('Forbidden');
+        error.status = 403;
 
-        return next(err);
+        return next(error);
       }
     } catch (err) {
       next(err);
     }
-  }
+  };
 };
