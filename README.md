@@ -58,5 +58,5 @@ async function getUserAsync(data) {
 }
 ```
 
-###Scopes explanation
+### Scopes explanation
 https://kidlno.atlassian.net/wiki/spaces/KIDL/pages/26181648/JWT-auth
