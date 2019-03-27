@@ -3,36 +3,15 @@ const checkAccess = require('../lib/checkAccess');
 module.exports = function (verify) {
   return async function (req, res, next) {
     try {
-      let method, params, route;
+      const variables = extractFrameworkVariables.apply(this, arguments);
 
-      if (arguments.length === 2) {
-        // koa
+      const { method, params, route } = variables;
 
-        const context = req;
-
-        req = req.req;
-
-        next = (err) => {
-          if (err) {
-            throw err;
-          } else {
-            res();
-          }
-        };
-
-        method = req.method.toLowerCase();
-        params = context.params;
-      } else {
-        // express
-
-        method = Object.keys(req.route.methods)[0];
-        params = req.params;
-        route = req.route.path.replace(/\//g, '').split(':')[0];
-      }
+      req = variables.req;
+      res = variables.res;
+      next = variables.next;
 
       const token = req.headers['x-access-token'];
-
-      let user;
 
       if (typeof token === 'undefined') {
         const err = new Error('Unauthorized');
@@ -58,7 +37,7 @@ module.exports = function (verify) {
           verify,
         };
 
-        user = await checkAccess(options);
+        const user = await checkAccess(options);
 
         if (user) {
           req.user = user;
@@ -81,3 +60,69 @@ module.exports = function (verify) {
     }
   };
 };
+
+function getPath(uri, params) {
+  const entries = uri.split('/');
+  let path = uri;
+
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i];
+
+    for (let j = 0; j < params.length; j++) {
+      const key = params[i];
+
+      if (entry === params[key]) {
+        path = path.replace(entry, ':' + key);
+      }
+    }
+  }
+
+  return path;
+}
+
+function extractFrameworkVariables(req, res, next) {
+  let method, params, route;
+
+  if (arguments.length === 2) {
+    // koa
+
+    const context = req;
+
+    req = req.req;
+
+    next = (err) => {
+      if (err) {
+        throw err;
+      } else {
+        res();
+      }
+    };
+
+    method = req.method.toLowerCase();
+    params = context.params;
+    route = getPath(req.url, params).replace(/\//g, '').split(':')[0];
+  } else {
+    if (req.raw) {
+      // fastify conversions for express
+
+      req.route = {};
+      req.route.methods = [req.raw.method.toLowerCase()];
+      req.route.path = getPath(req.raw.originalUrl, req.params);
+    }
+
+    // express
+
+    method = Object.keys(req.route.methods)[0];
+    params = req.params;
+    route = req.route.path.replace(/\//g, '').split(':')[0];
+  }
+
+  return {
+    req,
+    res,
+    next,
+    method,
+    params,
+    route,
+  }
+}
