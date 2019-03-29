@@ -5,7 +5,7 @@ module.exports = function (verify) {
     try {
       const variables = extractFrameworkVariables.apply(this, arguments);
 
-      const { method, params, route } = variables;
+      const { method, params, path } = variables;
 
       req = variables.req;
       res = variables.res;
@@ -29,9 +29,8 @@ module.exports = function (verify) {
           secret,
 
           service,
-
           method,
-          route,
+          path,
           params,
 
           verify,
@@ -62,17 +61,19 @@ module.exports = function (verify) {
 };
 
 function getPath(uri, params) {
-  const entries = uri.split('/');
+  const entries = uri.split('/').filter((item) => !!item);
   let path = uri;
+
+  const paramNames = Object.keys(params);
 
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
 
-    for (let j = 0; j < params.length; j++) {
-      const key = params[i];
+    for (let j = 0; j < paramNames.length; j++) {
+      const paramName = paramNames[j];
 
-      if (entry === params[key]) {
-        path = path.replace(entry, ':' + key);
+      if (entry === params[paramName]) {
+        path = path.replace(entry, ':' + paramName);
       }
     }
   }
@@ -81,7 +82,7 @@ function getPath(uri, params) {
 }
 
 function extractFrameworkVariables(req, res, next) {
-  let method, params, route;
+  let method, params, path;
 
   if (arguments.length === 2) {
     // koa
@@ -100,7 +101,7 @@ function extractFrameworkVariables(req, res, next) {
 
     method = req.method.toLowerCase();
     params = context.params;
-    route = getPath(req.url, params).replace(/\//g, '').split(':')[0];
+    path = getPath(req.url, params);
   } else {
     if (req.raw) {
       // fastify conversions for express
@@ -114,7 +115,7 @@ function extractFrameworkVariables(req, res, next) {
 
     method = Object.keys(req.route.methods)[0];
     params = req.params;
-    route = req.route.path.replace(/\//g, '').split(':')[0];
+    path = req.route.path;
   }
 
   return {
@@ -123,6 +124,6 @@ function extractFrameworkVariables(req, res, next) {
     next,
     method,
     params,
-    route,
+    path,
   }
 }
