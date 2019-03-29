@@ -58,5 +58,36 @@ async function getUserAsync(data) {
 }
 ```
 
+### Fastify
+```javascript
+const fastify = require('fastify')();
+const checkAccess = require('@kidl.no/express-auth-middleware')();
+const checkAccessWithVerify = require('@kidl.no/express-auth-middleware')(getUserAsync);
+
+async function routes (fastify, options) {
+  fastify.get('/users', {
+    preHandler: checkAccess,
+  }, async (request, reply) => {
+    return request.user;
+  });
+
+  fastify.get('/users/:username', {
+    preHandler: checkAccessWithVerify,
+  }, async (request, reply) => {
+    return request.user.username;
+  });
+}
+
+fastify.register(routes);
+
+async function getUserAsync(data) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(data);
+    }, 100);
+  });
+}
+```
+
 ### Scopes explanation
 https://kidlno.atlassian.net/wiki/spaces/KIDL/pages/26181648/JWT-auth

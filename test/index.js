@@ -9,8 +9,8 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const app = require('./assets/express/app');
 const appKoa = require('./assets/koa/app').callback();
+const appFastify = require('./assets/fastify/app');
 
-const parseScope = require('../lib/parseScope');
 const checkAccess = require('../lib/checkAccess');
 
 chai.use(chaiHttp);
@@ -19,37 +19,75 @@ const should = chai.should();
 const testUser = {
   _id: 1,
   username: 'testuser',
-  scope: '__all',
+  scope: {
+    default: {
+      default: ['.*'],
+    },
+  },
 };
 
 const testUser2 = {
   _id: 2,
   username: 'testuser2',
-  scope: '_get_auth',
+  scope: {
+    default: {
+      get: ['/auth.*'],
+    },
+  },
 };
 
 const testUser3 = {
   _id: 3,
   username: 'testuser3',
-  scope: '_get_all',
+  scope: {
+    default: {
+      get: ['.*'],
+    },
+  },
 };
 
 const testUser4 = {
   _id: 4,
   username: 'testuser4',
-  scope: 'auth_get_users',
+  scope: {
+    auth: {
+      get: ['/users.*']
+    }
+  },
 };
 
 const testUser5 = {
   _id: 5,
   username: 'testuser5',
-  scope: 'auth_post_users',
+  scope: {
+    auth: {
+      post: ['/users.*']
+    }
+  },
 };
 
 const testUser6 = {
   _id: 6,
   username: 'testuser6',
-  scope: 'auth_put_users:username',
+  scope: {
+    auth: {
+      put: ['/users/:username']
+    }
+  },
+};
+
+const testUser7 = {
+  _id: 7,
+  username: 'testuser7',
+  scope: {
+    auth: {
+      put: ['/users/:username'],
+      default: ['/cards.*']
+    },
+    default: {
+      get: ['.*']
+    }
+  },
 };
 
 const testUserToken = jwt.sign(testUser, process.env.JWT_SECRET);
@@ -58,238 +96,170 @@ const testUser3Token = jwt.sign(testUser3, process.env.JWT_SECRET);
 const testUser4Token = jwt.sign(testUser4, process.env.JWT_SECRET);
 const testUser5Token = jwt.sign(testUser5, process.env.JWT_SECRET);
 const testUser6Token = jwt.sign(testUser6, process.env.JWT_SECRET);
+const testUser7Token = jwt.sign(testUser7, process.env.JWT_SECRET);
 
 describe('lib', () => {
-  describe('parseScope', () => {
-    it('__all', () => {
-      const scope = parseScope('__all');
-
-      scope.should.be.a('object');
-
-      scope.should.have.property('service');
-      scope.should.have.property('method');
-      scope.should.have.property('route');
-      scope.should.have.property('paramname');
-
-      scope.service.should.be.eq('');
-      scope.method.should.be.eq('');
-      scope.route.should.be.eq('all');
-      should.not.exist(scope.paramname);
-    });
-
-    it('_get_auth', () => {
-      const scope = parseScope('_get_auth');
-
-      scope.should.be.a('object');
-
-      scope.should.have.property('service');
-      scope.should.have.property('method');
-      scope.should.have.property('route');
-      scope.should.have.property('paramname');
-
-      scope.service.should.be.eq('');
-      scope.method.should.be.eq('get');
-      scope.route.should.be.eq('auth');
-      should.not.exist(scope.paramname);
-    });
-
-    it('_get_', () => {
-      const scope = parseScope('_get_');
-
-      scope.should.be.a('object');
-
-      scope.should.have.property('service');
-      scope.should.have.property('method');
-      scope.should.have.property('route');
-      scope.should.have.property('paramname');
-
-      scope.service.should.be.eq('');
-      scope.method.should.be.eq('get');
-      scope.route.should.be.eq('');
-      should.not.exist(scope.paramname);
-    });
-
-    it('auth_get_', () => {
-      const scope = parseScope('auth_get_');
-
-      scope.should.be.a('object');
-
-      scope.should.have.property('service');
-      scope.should.have.property('method');
-      scope.should.have.property('route');
-      scope.should.have.property('paramname');
-
-      scope.service.should.be.eq('auth');
-      scope.method.should.be.eq('get');
-      scope.route.should.be.eq('');
-      should.not.exist(scope.paramname);
-    });
-
-    it('auth_post_users', () => {
-      const scope = parseScope('auth_post_users');
-
-      scope.should.be.a('object');
-
-      scope.should.have.property('service');
-      scope.should.have.property('method');
-      scope.should.have.property('route');
-      scope.should.have.property('paramname');
-
-      scope.service.should.be.eq('auth');
-      scope.method.should.be.eq('post');
-      scope.route.should.be.eq('users');
-      should.not.exist(scope.paramname);
-    });
-
-    it('auth_put_users:username', () => {
-      const scope = parseScope('auth_put_users:username');
-
-      scope.should.be.a('object');
-
-      scope.should.have.property('service');
-      scope.should.have.property('method');
-      scope.should.have.property('route');
-      scope.should.have.property('paramname');
-
-      scope.service.should.be.eq('auth');
-      scope.method.should.be.eq('put');
-      scope.route.should.be.eq('users');
-      scope.paramname.should.be.eq('username');
-    });
-  });
-
-
   describe('checkAccess', () => {
-    it('should return user object (testUser:__all, auth get /users/testuser)', async () => {
+    it('should return user object (testUser:__.*, auth get /users/testuser)', async () => {
       const options = {};
 
       options.token = testUserToken;
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'auth';
-
       options.method = 'get';
-      options.route = 'users';
-      options.params = { username: 'testuser' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.eq('__all');
+      user.scope.should.be.deep.eq(testUser.scope);
     });
 
-    it('should return user object (testUser:__all, auth post /users/testuser)', async () => {
+    it('should return user object (testUser:__.*, auth post /users/testuser)', async () => {
       const options = {};
 
       options.token = testUserToken;
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'auth';
-
       options.method = 'post';
-      options.route = 'users';
-      options.params = { username: 'testuser' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.eq('__all');
+      user.scope.should.be.deep.eq(testUser.scope);
     });
 
-    it('should return user object (testUser:__all, auth put /users/testuser)', async () => {
+    it('should return user object (testUser:__.*, auth put /users/testuser)', async () => {
       const options = {};
 
       options.token = testUserToken;
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'auth';
-
       options.method = 'put';
-      options.route = 'users';
-      options.params = { username: 'testuser' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.eq('__all');
+      user.scope.should.be.deep.eq(testUser.scope);
     });
 
-    it('should return user object (testUser:__all, auth delete /users/testuser)', async () => {
+    it('should return user object (testUser:__.*, auth delete /users/testuser)', async () => {
       const options = {};
 
       options.token = testUserToken;
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'auth';
-
       options.method = 'delete';
-      options.route = 'users';
-      options.params = { username: 'testuser' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.eq('__all');
+      user.scope.should.be.deep.eq(testUser.scope);
     });
 
-    it('should return user object (testUser:__all, cards delete /users/testuser)', async () => {
+    it('should return user object (testUser:__.*, cards delete /users/testuser)', async () => {
       const options = {};
 
       options.token = testUserToken;
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'cards';
-
       options.method = 'delete';
-      options.route = 'users';
-      options.params = { username: 'testuser' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.eq('__all');
+      user.scope.should.be.deep.eq(testUser.scope);
     });
 
-    it('should return user object (testUser:__all, cards post /cards)', async () => {
+    it('should return user object (testUser:__.*, cards post /cards)', async () => {
       const options = {};
 
       options.token = testUserToken;
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'cards';
-
       options.method = 'post';
-      options.route = 'cards';
+      options.path = 'cards';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.eq('__all');
+      user.scope.should.be.deep.eq(testUser.scope);
     });
 
-    it('should return user object (testUser:__all, cards get /cards/123)', async () => {
+    it('should return user object (testUser:__.*, cards get /cards/123)', async () => {
       const options = {};
 
       options.token = testUserToken;
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'cards';
-
       options.method = 'get';
-      options.route = 'cards';
+      options.path = 'cards';
       options.params = { cards: '123' };
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.eq('__all');
+      user.scope.should.be.deep.eq(testUser.scope);
     });
 
     it('should return user object (testUser2:_get_auth, auth get /auth/testuser2)', async () => {
@@ -299,16 +269,20 @@ describe('lib', () => {
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'auth';
-
       options.method = 'get';
-      options.route = 'auth';
-      options.params = { username: 'testuser2' };
+      options.path = '/auth/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(2);
       user.username.should.be.eq('testuser2');
-      user.scope.should.be.eq('_get_auth');
+      user.scope.should.be.deep.eq(testUser2.scope);
     });
 
     it('should return user object (testUser2:_get_auth, cards get /auth/testuser2)', async () => {
@@ -318,16 +292,20 @@ describe('lib', () => {
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'cards';
-
       options.method = 'get';
-      options.route = 'auth';
-      options.params = { username: 'testuser2' };
+      options.path = '/auth/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(2);
       user.username.should.be.eq('testuser2');
-      user.scope.should.be.eq('_get_auth');
+      user.scope.should.be.deep.eq(testUser2.scope);
     });
 
     it('should return user object (testUser2:_get_auth, cards get /auth)', async () => {
@@ -337,91 +315,112 @@ describe('lib', () => {
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'cards';
-
       options.method = 'get';
-      options.route = 'auth';
+      options.path = '/auth';
 
       const user = await checkAccess(options);
+
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
 
       user._id.should.be.eq(2);
       user.username.should.be.eq('testuser2');
-      user.scope.should.be.eq('_get_auth');
+      user.scope.should.be.deep.eq(testUser2.scope);
     });
 
-    it('should return user object (testUser3:_get_all, auth get /users/testuser3)', async () => {
+    it('should return user object (testUser3:_get_.*, auth get /users/testuser3)', async () => {
       const options = {};
 
       options.token = testUser3Token;
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'auth';
-
       options.method = 'get';
-      options.route = 'users';
-      options.params = { username: 'testuser3' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(3);
       user.username.should.be.eq('testuser3');
-      user.scope.should.be.eq('_get_all');
+      user.scope.should.be.deep.eq(testUser3.scope);
     });
 
-    it('should return user object (testUser3:_get_all, auth get /users/testuser6)', async () => {
+    it('should return user object (testUser3:_get_.*, auth get /users/testuser6)', async () => {
       const options = {};
 
       options.token = testUser3Token;
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'auth';
-
       options.method = 'get';
-      options.route = 'users';
-      options.params = { username: 'testuser6' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(3);
       user.username.should.be.eq('testuser3');
-      user.scope.should.be.eq('_get_all');
+      user.scope.should.be.deep.eq(testUser3.scope);
     });
 
-    it('should return user object (testUser3:_get_all, auth get /lalala/123/testuser6)', async () => {
+    it('should return user object (testUser3:_get_.*, auth get /lalala/123/testuser6)', async () => {
       const options = {};
 
       options.token = testUser3Token;
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'auth';
-
       options.method = 'get';
-      options.route = 'lalala123';
-      options.params = { username: 'testuser6' };
+      options.path = '/lalala/123/testuser6';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(3);
       user.username.should.be.eq('testuser3');
-      user.scope.should.be.eq('_get_all');
+      user.scope.should.be.deep.eq(testUser3.scope);
     });
 
-    it('should return user object (testUser3:_get_all, cards get /lalala/1234/testuser65)', async () => {
+    it('should return user object (testUser3:_get_.*, cards get /lalala/1234/testuser65)', async () => {
       const options = {};
 
       options.token = testUser3Token;
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'cards';
-
       options.method = 'get';
-      options.route = 'lalala1234';
-      options.params = { username: 'testuser65' };
+      options.path = '/lalala/1234/testuser65';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(3);
       user.username.should.be.eq('testuser3');
-      user.scope.should.be.eq('_get_all');
+      user.scope.should.be.deep.eq(testUser3.scope);
     });
 
     it('should return user object (testUser4:auth_get_users, auth get /users/testuser4)', async () => {
@@ -431,16 +430,20 @@ describe('lib', () => {
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'auth';
-
       options.method = 'get';
-      options.route = 'users';
-      options.params = { username: 'testuser4' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(4);
       user.username.should.be.eq('testuser4');
-      user.scope.should.be.eq('auth_get_users');
+      user.scope.should.be.deep.eq(testUser4.scope);
     });
 
     it('should return user object (testUser5:auth_post_users, auth post /users/testuser5)', async () => {
@@ -450,16 +453,20 @@ describe('lib', () => {
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'auth';
-
       options.method = 'post';
-      options.route = 'users';
-      options.params = { username: 'testuser5' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(5);
       user.username.should.be.eq('testuser5');
-      user.scope.should.be.eq('auth_post_users');
+      user.scope.should.be.deep.eq(testUser5.scope);
     });
 
     it('should return user object (testUser6:auth_put_users:username, auth put /users/testuser6)', async () => {
@@ -469,16 +476,20 @@ describe('lib', () => {
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'auth';
-
       options.method = 'put';
-      options.route = 'users';
-      options.params = { username: 'testuser6' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(6);
       user.username.should.be.eq('testuser6');
-      user.scope.should.be.eq('auth_put_users:username');
+      user.scope.should.be.deep.eq(testUser6.scope);
     });
 
     it('should return user object (testUser6:auth_put_users:username, auth put /users)', async () => {
@@ -488,16 +499,89 @@ describe('lib', () => {
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'auth';
-
       options.method = 'put';
-      options.route = 'users';
-      options.params = { username: 'testuser6' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
 
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
       user._id.should.be.eq(6);
       user.username.should.be.eq('testuser6');
-      user.scope.should.be.eq('auth_put_users:username');
+      user.scope.should.be.deep.eq(testUser6.scope);
+    });
+
+    it('should return user object (testUser7:auth_put_users:username|auth__cards.*|_get_.*, auth put /users)', async () => {
+      const options = {};
+
+      options.token = testUser7Token;
+      options.secret = process.env.JWT_SECRET;
+
+      options.service = 'auth';
+      options.method = 'put';
+      options.path = '/users/:username';
+
+      const user = await checkAccess(options);
+
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
+      user._id.should.be.eq(7);
+      user.username.should.be.eq('testuser7');
+      user.scope.should.be.deep.eq(testUser7.scope);
+    });
+
+    it('should return user object (testUser7:auth_put_users:username|auth__cards.*|_get_.*, auth get /users/testuser7)', async () => {
+      const options = {};
+
+      options.token = testUser7Token;
+      options.secret = process.env.JWT_SECRET;
+
+      options.service = 'default';
+      options.method = 'get';
+      options.path = '/users/:username';
+
+      const user = await checkAccess(options);
+
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
+      user._id.should.be.eq(7);
+      user.username.should.be.eq('testuser7');
+      user.scope.should.be.deep.eq(testUser7.scope);
+    });
+
+    it('should return user object (testUser7:auth_put_users:username|auth__cards.*|_get_.*, auth get /cards/123)', async () => {
+      const options = {};
+
+      options.token = testUser7Token;
+      options.secret = process.env.JWT_SECRET;
+
+      options.service = 'auth';
+      options.method = 'get';
+      options.path = '/cards/:cardId';
+
+      const user = await checkAccess(options);
+
+      should.exist(user);
+
+      user.should.have.property('_id');
+      user.should.have.property('username');
+      user.should.have.property('scope');
+
+      user._id.should.be.eq(7);
+      user.username.should.be.eq('testuser7');
+      user.scope.should.be.deep.eq(testUser7.scope);
     });
 
     it('should return false (testUser6:auth_put_users:username, auth post /users/testuser6)', async () => {
@@ -509,10 +593,11 @@ describe('lib', () => {
       options.service = 'auth';
 
       options.method = 'post';
-      options.route = 'users';
-      options.params = { username: 'testuser6' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
+
+      should.exist(user);
 
       user.should.be.eq(false);
     });
@@ -526,10 +611,11 @@ describe('lib', () => {
       options.service = 'auth';
 
       options.method = 'get';
-      options.route = 'users';
-      options.params = { username: 'testuser6' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
+
+      should.exist(user);
 
       user.should.be.eq(false);
     });
@@ -543,10 +629,11 @@ describe('lib', () => {
       options.service = 'auth';
 
       options.method = 'put';
-      options.route = 'cards';
-      options.params = { card: '123' };
+      options.path = '/cards/:cardId';
 
       const user = await checkAccess(options);
+
+      should.exist(user);
 
       user.should.be.eq(false);
     });
@@ -558,12 +645,46 @@ describe('lib', () => {
       options.secret = process.env.JWT_SECRET;
 
       options.service = 'cards';
-
       options.method = 'put';
-      options.route = 'users';
-      options.params = { username: 'testuser6' };
+      options.path = '/users/:username';
 
       const user = await checkAccess(options);
+
+      should.exist(user);
+
+      user.should.be.eq(false);
+    });
+
+    it('should return false (testUser7:auth_put_users:username|auth__cards.*|_get_.*, auth get /apples/123)', async () => {
+      const options = {};
+
+      options.token = testUser7Token;
+      options.secret = process.env.JWT_SECRET;
+
+      options.service = 'auth';
+      options.method = 'get';
+      options.path = '/apples/:id';
+
+      const user = await checkAccess(options);
+
+      should.exist(user);
+
+      user.should.be.eq(false);
+    });
+
+    it('should return false (testUser7:auth_put_users:username|auth__cards.*|_get_.*, auth get /users/testuser7)', async () => {
+      const options = {};
+
+      options.token = testUser7Token;
+      options.secret = process.env.JWT_SECRET;
+
+      options.service = 'auth';
+      options.method = 'get';
+      options.path = '/users/:username';
+
+      const user = await checkAccess(options);
+
+      should.exist(user);
 
       user.should.be.eq(false);
     });
@@ -687,6 +808,69 @@ describe('middleware', () => {
 
     it('should return user', (done) => {
       chai.request(appKoa)
+        .get('/users')
+        .set('x-access-token', testUserToken)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.username.should.be.eq('testuser');
+
+          done();
+        });
+    });
+  });
+
+  describe('checkAccess (fastify)', () => {
+    it('should return user', (done) => {
+      chai.request(appFastify)
+        .get('/users/testuser')
+        .set('x-access-token', testUserToken)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.text.should.be.a('string');
+          res.text.should.be.eq('testuser');
+
+          done();
+        });
+    });
+
+    it('should return error 401 Unauthorized (no token)', (done) => {
+      chai.request(appFastify)
+        .get('/users')
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.be.a('object');
+
+          done();
+        });
+    });
+
+    it('should return error 403 Forbidden (low scope)', (done) => {
+      chai.request(appFastify)
+        .get('/users')
+        .set('x-access-token', testUser2Token)
+        .end((err, res) => {
+          res.should.have.status(403);
+          res.body.should.be.a('object');
+
+          done();
+        });
+    });
+
+    it('should return error 403 Forbidden (invalid token)', (done) => {
+      chai.request(appFastify)
+        .get('/users')
+        .set('x-access-token', 123)
+        .end((err, res) => {
+          res.should.have.status(403);
+          res.body.should.be.a('object');
+
+          done();
+        });
+    });
+
+    it('should return user', (done) => {
+      chai.request(appFastify)
         .get('/users')
         .set('x-access-token', testUserToken)
         .end((err, res) => {
