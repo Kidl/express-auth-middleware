@@ -61,6 +61,8 @@ module.exports = function (verify) {
 };
 
 function getPath(uri, params) {
+  uri = uri.replace(/\?.*$/, '');
+
   const entries = uri.split('/').filter((item) => !!item);
   let path = uri;
 
