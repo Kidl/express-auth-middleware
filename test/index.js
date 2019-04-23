@@ -584,7 +584,7 @@ describe('lib', () => {
       user.scope.should.be.deep.eq(testUser7.scope);
     });
 
-    it('should return false (testUser6:auth_put_users:username, auth post /users/testuser6)', async () => {
+    it('should throw error (testUser6:auth_put_users:username, auth post /users/testuser6)', async () => {
       const options = {};
 
       options.token = testUser6Token;
@@ -595,14 +595,22 @@ describe('lib', () => {
       options.method = 'post';
       options.path = '/users/:username';
 
-      const user = await checkAccess(options);
+      let error;
 
-      should.exist(user);
+      try {
+        await checkAccess(options);
+      } catch (err) {
+        error = err;
+      }
 
-      user.should.be.eq(false);
+
+      should.exist(error);
+
+      error.should.be.an('error');
+      error.message.should.be.eq('You cannot perform post to /users/:username');
     });
 
-    it('should return false (testUser6:auth_put_users:username, auth get /users/testuser6)', async () => {
+    it('should throw error (testUser6:auth_put_users:username, auth get /users/testuser6)', async () => {
       const options = {};
 
       options.token = testUser6Token;
@@ -613,14 +621,22 @@ describe('lib', () => {
       options.method = 'get';
       options.path = '/users/:username';
 
-      const user = await checkAccess(options);
+      let error;
 
-      should.exist(user);
+      try {
+        await checkAccess(options);
+      } catch (err) {
+        error = err;
+      }
 
-      user.should.be.eq(false);
+
+      should.exist(error);
+
+      error.should.be.an('error');
+      error.message.should.be.eq('You cannot perform get to /users/:username');
     });
 
-    it('should return false (testUser6:auth_put_users:username, auth put /cards/123)', async () => {
+    it('should throw error (testUser6:auth_put_users:username, auth put /cards/123)', async () => {
       const options = {};
 
       options.token = testUser6Token;
@@ -631,14 +647,22 @@ describe('lib', () => {
       options.method = 'put';
       options.path = '/cards/:cardId';
 
-      const user = await checkAccess(options);
+      let error;
 
-      should.exist(user);
+      try {
+        await checkAccess(options);
+      } catch (err) {
+        error = err;
+      }
 
-      user.should.be.eq(false);
+
+      should.exist(error);
+
+      error.should.be.an('error');
+      error.message.should.be.eq('You cannot perform put to /cards/:cardId');
     });
 
-    it('should return false (testUser6:auth_put_users:username, cards put /users/testuser6)', async () => {
+    it('should throw error (testUser6:auth_put_users:username, cards put /users/testuser6)', async () => {
       const options = {};
 
       options.token = testUser6Token;
@@ -648,14 +672,22 @@ describe('lib', () => {
       options.method = 'put';
       options.path = '/users/:username';
 
-      const user = await checkAccess(options);
+      let error;
 
-      should.exist(user);
+      try {
+        await checkAccess(options);
+      } catch (err) {
+        error = err;
+      }
 
-      user.should.be.eq(false);
+
+      should.exist(error);
+
+      error.should.be.an('error');
+      error.message.should.be.eq('You cannot perform put to /users/:username');
     });
 
-    it('should return false (testUser7:auth_put_users:username|auth__cards.*|_get_.*, auth get /apples/123)', async () => {
+    it('should throw error (testUser7:auth_put_users:username|auth__cards.*|_get_.*, auth get /apples/123)', async () => {
       const options = {};
 
       options.token = testUser7Token;
@@ -665,14 +697,22 @@ describe('lib', () => {
       options.method = 'get';
       options.path = '/apples/:id';
 
-      const user = await checkAccess(options);
+      let error;
 
-      should.exist(user);
+      try {
+        await checkAccess(options);
+      } catch (err) {
+        error = err;
+      }
 
-      user.should.be.eq(false);
+
+      should.exist(error);
+
+      error.should.be.an('error');
+      error.message.should.be.eq('You cannot perform get to /apples/:id');
     });
 
-    it('should return false (testUser7:auth_put_users:username|auth__cards.*|_get_.*, auth get /users/testuser7)', async () => {
+    it('should throw error (testUser7:auth_put_users:username|auth__cards.*|_get_.*, auth get /users/testuser7)', async () => {
       const options = {};
 
       options.token = testUser7Token;
@@ -682,11 +722,19 @@ describe('lib', () => {
       options.method = 'get';
       options.path = '/users/:username';
 
-      const user = await checkAccess(options);
+      let error;
 
-      should.exist(user);
+      try {
+        await checkAccess(options);
+      } catch (err) {
+        error = err;
+      }
 
-      user.should.be.eq(false);
+
+      should.exist(error);
+
+      error.should.be.an('error');
+      error.message.should.be.eq('You cannot perform get to /users/:username');
     });
   });
 });

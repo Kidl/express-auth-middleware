@@ -14,7 +14,7 @@ module.exports = function (verify) {
       const token = req.headers['x-access-token'];
 
       if (typeof token === 'undefined') {
-        const err = new Error('Unauthorized');
+        const err = new Error('Token is missing.');
         err.status = 401;
 
         return next(err);
@@ -36,23 +36,16 @@ module.exports = function (verify) {
           verify,
         };
 
-        const user = await checkAccess(options);
+        req.user = await checkAccess(options);
 
-        if (user) {
-          req.user = user;
-
-          next();
-        } else {
-          const err = new Error('Forbidden');
-          err.status = 403;
-
-          return next(err);
-        }
+        next();
       } catch (err) {
-        const error = new Error('Forbidden');
-        error.status = 403;
+        err.message = err.message.replace('jwt', 'token');
+        err.message = err.message.charAt(0).toUpperCase() + err.message.slice(1) + '.';
 
-        return next(error);
+        err.status = 403;
+
+        return next(err);
       }
     } catch (err) {
       next(err);
@@ -109,11 +102,10 @@ function extractFrameworkVariables(req, res, next) {
       // fastify conversions for express
 
       req.route = {};
-      req.route.methods = [req.raw.method.toLowerCase()];
+      req.route.methods = {};
+      req.route.methods[req.raw.method.toLowerCase()] = true;
       req.route.path = getPath(req.raw.originalUrl, req.params);
     }
-
-    // express
 
     method = Object.keys(req.route.methods)[0];
     params = req.params;
