@@ -12,6 +12,7 @@ const appKoa = require('./assets/koa/app').callback();
 const appFastify = require('./assets/fastify/app');
 
 const checkAccess = require('../lib/checkAccess');
+const cryptographer = require('../lib/cryptographer');
 
 chai.use(chaiHttp);
 const should = chai.should();
@@ -90,13 +91,31 @@ const testUser7 = {
   },
 };
 
-const testUserToken = jwt.sign(testUser, process.env.JWT_SECRET);
-const testUser2Token = jwt.sign(testUser2, process.env.JWT_SECRET);
-const testUser3Token = jwt.sign(testUser3, process.env.JWT_SECRET);
-const testUser4Token = jwt.sign(testUser4, process.env.JWT_SECRET);
-const testUser5Token = jwt.sign(testUser5, process.env.JWT_SECRET);
-const testUser6Token = jwt.sign(testUser6, process.env.JWT_SECRET);
-const testUser7Token = jwt.sign(testUser7, process.env.JWT_SECRET);
+let testUserToken;
+let testUser2Token;
+let testUser3Token;
+let testUser4Token;
+let testUser5Token;
+let testUser6Token;
+let testUser7Token;
+
+if (process.env.CRYPTO_SECRET) {
+  testUserToken = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser))}, process.env.JWT_SECRET);
+  testUser2Token = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser2))}, process.env.JWT_SECRET);
+  testUser3Token = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser3))}, process.env.JWT_SECRET);
+  testUser4Token = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser4))}, process.env.JWT_SECRET);
+  testUser5Token = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser5))}, process.env.JWT_SECRET);
+  testUser6Token = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser6))}, process.env.JWT_SECRET);
+  testUser7Token = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser7))}, process.env.JWT_SECRET);
+} else {
+  testUserToken = jwt.sign(testUser, process.env.JWT_SECRET);
+  testUser2Token = jwt.sign(testUser2, process.env.JWT_SECRET);
+  testUser3Token = jwt.sign(testUser3, process.env.JWT_SECRET);
+  testUser4Token = jwt.sign(testUser4, process.env.JWT_SECRET);
+  testUser5Token = jwt.sign(testUser5, process.env.JWT_SECRET);
+  testUser6Token = jwt.sign(testUser6, process.env.JWT_SECRET);
+  testUser7Token = jwt.sign(testUser7, process.env.JWT_SECRET);
+}
 
 describe('lib', () => {
   describe('checkAccess', () => {
