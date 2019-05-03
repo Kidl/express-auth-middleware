@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "test": "mocha --timeout 10000 --exit",
-    "lint": "eslint --ignore-path .gitignore ."
+    "lint": "eslint --ignore-path .gitignore .",
+    "lint:fix": "eslint --fix --ignore-path .gitignore ."
   },
   "author": "Vladislav Sevostyanov <vs@kidl.no>",
   "dependencies": {

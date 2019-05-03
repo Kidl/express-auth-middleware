@@ -52,8 +52,8 @@ const testUser4 = {
   username: 'testuser4',
   scope: {
     auth: {
-      get: ['/users.*']
-    }
+      get: ['/users.*'],
+    },
   },
 };
 
@@ -62,8 +62,8 @@ const testUser5 = {
   username: 'testuser5',
   scope: {
     auth: {
-      post: ['/users.*']
-    }
+      post: ['/users.*'],
+    },
   },
 };
 
@@ -72,8 +72,8 @@ const testUser6 = {
   username: 'testuser6',
   scope: {
     auth: {
-      put: ['/users/:username']
-    }
+      put: ['/users/:username'],
+    },
   },
 };
 
@@ -83,11 +83,11 @@ const testUser7 = {
   scope: {
     auth: {
       put: ['/users/:username'],
-      default: ['/cards.*']
+      default: ['/cards.*'],
     },
     default: {
-      get: ['.*']
-    }
+      get: ['.*'],
+    },
   },
 };
 
@@ -100,13 +100,13 @@ let testUser6Token;
 let testUser7Token;
 
 if (process.env.CRYPTO_SECRET) {
-  testUserToken = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser))}, process.env.JWT_SECRET);
-  testUser2Token = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser2))}, process.env.JWT_SECRET);
-  testUser3Token = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser3))}, process.env.JWT_SECRET);
-  testUser4Token = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser4))}, process.env.JWT_SECRET);
-  testUser5Token = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser5))}, process.env.JWT_SECRET);
-  testUser6Token = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser6))}, process.env.JWT_SECRET);
-  testUser7Token = jwt.sign({body: cryptographer.encrypt(JSON.stringify(testUser7))}, process.env.JWT_SECRET);
+  testUserToken = jwt.sign({ body: cryptographer.encrypt(JSON.stringify(testUser)) }, process.env.JWT_SECRET);
+  testUser2Token = jwt.sign({ body: cryptographer.encrypt(JSON.stringify(testUser2)) }, process.env.JWT_SECRET);
+  testUser3Token = jwt.sign({ body: cryptographer.encrypt(JSON.stringify(testUser3)) }, process.env.JWT_SECRET);
+  testUser4Token = jwt.sign({ body: cryptographer.encrypt(JSON.stringify(testUser4)) }, process.env.JWT_SECRET);
+  testUser5Token = jwt.sign({ body: cryptographer.encrypt(JSON.stringify(testUser5)) }, process.env.JWT_SECRET);
+  testUser6Token = jwt.sign({ body: cryptographer.encrypt(JSON.stringify(testUser6)) }, process.env.JWT_SECRET);
+  testUser7Token = jwt.sign({ body: cryptographer.encrypt(JSON.stringify(testUser7)) }, process.env.JWT_SECRET);
 } else {
   testUserToken = jwt.sign(testUser, process.env.JWT_SECRET);
   testUser2Token = jwt.sign(testUser2, process.env.JWT_SECRET);

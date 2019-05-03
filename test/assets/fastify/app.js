@@ -7,4 +7,3 @@ fastify.register(routes);
 fastify.listen();
 
 module.exports = fastify.server;
-

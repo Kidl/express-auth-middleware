@@ -41,7 +41,7 @@ module.exports = function (verify) {
         next();
       } catch (err) {
         err.message = err.message.replace('jwt', 'token');
-        err.message = err.message.charAt(0).toUpperCase() + err.message.slice(1) + '.';
+        err.message = `${err.message.charAt(0).toUpperCase() + err.message.slice(1)}.`;
 
         err.status = 403;
 
@@ -56,7 +56,7 @@ module.exports = function (verify) {
 function getPath(uri, params) {
   uri = uri.replace(/\?.*$/, '');
 
-  const entries = uri.split('/').filter((item) => !!item);
+  const entries = uri.split('/').filter(item => !!item);
   let path = uri;
 
   const paramNames = Object.keys(params);
@@ -68,7 +68,7 @@ function getPath(uri, params) {
       const paramName = paramNames[j];
 
       if (entry === params[paramName]) {
-        path = path.replace(entry, ':' + paramName);
+        path = path.replace(entry, `:${paramName}`);
       }
     }
   }
@@ -119,5 +119,5 @@ function extractFrameworkVariables(req, res, next) {
     method,
     params,
     path,
-  }
+  };
 }
