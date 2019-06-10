@@ -1,6 +1,6 @@
 {
   "name": "@kidl.no/express-auth-middleware",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "",
   "main": "middleware/checkAccess.js",
   "files": [
