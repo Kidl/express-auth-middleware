@@ -9,7 +9,7 @@ module.exports = function (verify) {
 
       req = variables.req;
       res = variables.res;
-      next = variables.next;
+      next = variables.framework === 'fastify' && variables.next instanceof Promise ? () => {} : variables.next;
 
       const token = req.headers['x-access-token'];
 
@@ -45,7 +45,7 @@ module.exports = function (verify) {
 
         err.status = 403;
 
-        return next(err);
+        next(err);
       }
     } catch (err) {
       next(err);
@@ -77,10 +77,13 @@ function getPath(uri, params) {
 }
 
 function extractFrameworkVariables(req, res, next) {
-  let method, params, path;
+  let method, params, path, framework;
+
+  framework = 'express';
 
   if (arguments.length === 2) {
     // koa
+    framework = 'koa';
 
     const context = req;
 
@@ -105,6 +108,8 @@ function extractFrameworkVariables(req, res, next) {
       req.route.methods = {};
       req.route.methods[req.raw.method.toLowerCase()] = true;
       req.route.path = getPath(req.raw.originalUrl, req.params);
+
+      framework = 'fastify';
     }
 
     method = Object.keys(req.route.methods)[0];
@@ -119,5 +124,6 @@ function extractFrameworkVariables(req, res, next) {
     method,
     params,
     path,
+    framework,
   };
 }

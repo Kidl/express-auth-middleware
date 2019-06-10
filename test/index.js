@@ -133,13 +133,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.deep.eq(testUser.scope);
     });
 
     it('should return user object (testUser:__.*, auth post /users/testuser)', async () => {
@@ -156,13 +151,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.deep.eq(testUser.scope);
     });
 
     it('should return user object (testUser:__.*, auth put /users/testuser)', async () => {
@@ -179,13 +169,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.deep.eq(testUser.scope);
     });
 
     it('should return user object (testUser:__.*, auth delete /users/testuser)', async () => {
@@ -202,13 +187,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.deep.eq(testUser.scope);
     });
 
     it('should return user object (testUser:__.*, cards delete /users/testuser)', async () => {
@@ -225,13 +205,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.deep.eq(testUser.scope);
     });
 
     it('should return user object (testUser:__.*, cards post /cards)', async () => {
@@ -248,13 +223,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.deep.eq(testUser.scope);
     });
 
     it('should return user object (testUser:__.*, cards get /cards/123)', async () => {
@@ -272,13 +242,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(1);
       user.username.should.be.eq('testuser');
-      user.scope.should.be.deep.eq(testUser.scope);
     });
 
     it('should return user object (testUser2:_get_auth, auth get /auth/testuser2)', async () => {
@@ -295,13 +260,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(2);
       user.username.should.be.eq('testuser2');
-      user.scope.should.be.deep.eq(testUser2.scope);
     });
 
     it('should return user object (testUser2:_get_auth, cards get /auth/testuser2)', async () => {
@@ -318,13 +278,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(2);
       user.username.should.be.eq('testuser2');
-      user.scope.should.be.deep.eq(testUser2.scope);
     });
 
     it('should return user object (testUser2:_get_auth, cards get /auth)', async () => {
@@ -341,13 +296,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(2);
       user.username.should.be.eq('testuser2');
-      user.scope.should.be.deep.eq(testUser2.scope);
     });
 
     it('should return user object (testUser3:_get_.*, auth get /users/testuser3)', async () => {
@@ -364,13 +314,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(3);
       user.username.should.be.eq('testuser3');
-      user.scope.should.be.deep.eq(testUser3.scope);
     });
 
     it('should return user object (testUser3:_get_.*, auth get /users/testuser6)', async () => {
@@ -387,13 +332,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(3);
       user.username.should.be.eq('testuser3');
-      user.scope.should.be.deep.eq(testUser3.scope);
     });
 
     it('should return user object (testUser3:_get_.*, auth get /lalala/123/testuser6)', async () => {
@@ -410,13 +350,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(3);
       user.username.should.be.eq('testuser3');
-      user.scope.should.be.deep.eq(testUser3.scope);
     });
 
     it('should return user object (testUser3:_get_.*, cards get /lalala/1234/testuser65)', async () => {
@@ -433,13 +368,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(3);
       user.username.should.be.eq('testuser3');
-      user.scope.should.be.deep.eq(testUser3.scope);
     });
 
     it('should return user object (testUser4:auth_get_users, auth get /users/testuser4)', async () => {
@@ -456,13 +386,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(4);
       user.username.should.be.eq('testuser4');
-      user.scope.should.be.deep.eq(testUser4.scope);
     });
 
     it('should return user object (testUser5:auth_post_users, auth post /users/testuser5)', async () => {
@@ -479,13 +404,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(5);
       user.username.should.be.eq('testuser5');
-      user.scope.should.be.deep.eq(testUser5.scope);
     });
 
     it('should return user object (testUser6:auth_put_users:username, auth put /users/testuser6)', async () => {
@@ -502,13 +422,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(6);
       user.username.should.be.eq('testuser6');
-      user.scope.should.be.deep.eq(testUser6.scope);
     });
 
     it('should return user object (testUser6:auth_put_users:username, auth put /users)', async () => {
@@ -525,13 +440,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(6);
       user.username.should.be.eq('testuser6');
-      user.scope.should.be.deep.eq(testUser6.scope);
     });
 
     it('should return user object (testUser7:auth_put_users:username|auth__cards.*|_get_.*, auth put /users)', async () => {
@@ -548,13 +458,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(7);
       user.username.should.be.eq('testuser7');
-      user.scope.should.be.deep.eq(testUser7.scope);
     });
 
     it('should return user object (testUser7:auth_put_users:username|auth__cards.*|_get_.*, auth get /users/testuser7)', async () => {
@@ -571,13 +476,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(7);
       user.username.should.be.eq('testuser7');
-      user.scope.should.be.deep.eq(testUser7.scope);
     });
 
     it('should return user object (testUser7:auth_put_users:username|auth__cards.*|_get_.*, auth get /cards/123)', async () => {
@@ -594,13 +494,8 @@ describe('lib', () => {
 
       should.exist(user);
 
-      user.should.have.property('_id');
       user.should.have.property('username');
-      user.should.have.property('scope');
-
-      user._id.should.be.eq(7);
       user.username.should.be.eq('testuser7');
-      user.scope.should.be.deep.eq(testUser7.scope);
     });
 
     it('should throw error (testUser6:auth_put_users:username, auth post /users/testuser6)', async () => {
@@ -621,7 +516,6 @@ describe('lib', () => {
       } catch (err) {
         error = err;
       }
-
 
       should.exist(error);
 
@@ -674,7 +568,6 @@ describe('lib', () => {
         error = err;
       }
 
-
       should.exist(error);
 
       error.should.be.an('error');
@@ -698,7 +591,6 @@ describe('lib', () => {
       } catch (err) {
         error = err;
       }
-
 
       should.exist(error);
 
@@ -724,7 +616,6 @@ describe('lib', () => {
         error = err;
       }
 
-
       should.exist(error);
 
       error.should.be.an('error');
@@ -748,7 +639,6 @@ describe('lib', () => {
       } catch (err) {
         error = err;
       }
-
 
       should.exist(error);
 
