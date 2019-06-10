@@ -9,7 +9,7 @@ module.exports = function (verify) {
 
       req = variables.req;
       res = variables.res;
-      next = variables.framework === 'fastify' && variables.next instanceof Promise ? () => {} : variables.next;
+      next = variables.framework === 'fastify' && verify instanceof Promise ? () => {} : variables.next;
 
       const token = req.headers['x-access-token'];
 
