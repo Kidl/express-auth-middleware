@@ -2,13 +2,35 @@ const checkAccess = require('../../../../middleware/checkAccess')();
 const checkAccessWithVerify = require('../../../../middleware/checkAccess')(getUserAsync);
 
 async function routes(fastify, options) {
-  fastify.get('/users', {
+  fastify.route({
+    method: 'GET',
+    url: '/users',
     preHandler: checkAccess,
-  }, async (request, reply) => request.user);
+    handler: async (request, reply) => {
+      async function test() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => resolve(request.user), 100);
+        });
+      }
 
-  fastify.get('/users/:username', {
+      const response = await test();
+
+      return response;
+    },
+  });
+
+  fastify.route({
+    method: 'GET',
+    url: '/users/:username',
     preHandler: checkAccessWithVerify,
-  }, async (request, reply) => request.user.username);
+    handler: async (request, reply) => {
+      const response = await new Promise((resolve, reject) => {
+        setTimeout(() => resolve(request.user.username), 100);
+      });
+
+      return response;
+    }
+  });
 }
 
 module.exports = routes;
